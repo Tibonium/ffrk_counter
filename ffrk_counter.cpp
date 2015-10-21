@@ -6,7 +6,9 @@
  */
 ffrk_counter::ffrk_counter(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ffrk_counter)
+    ui(new Ui::ffrk_counter),
+    _data_file("ffrk_counter_data"),
+    _settings("Tibonium Inc.", "FFRK Counter")
 {
     ui->setupUi(this);
     QIntValidator *validator = new QIntValidator(0, 1000000, this) ;
@@ -37,6 +39,8 @@ ffrk_counter::ffrk_counter(QWidget *parent) :
     ui->count3_3->setValidator( validator ) ;
     ui->count3_3->installEventFilter( this ) ;
 
+    restore_settings() ;
+    load_data() ;
 }
 
 /**
@@ -45,6 +49,137 @@ ffrk_counter::ffrk_counter(QWidget *parent) :
 ffrk_counter::~ffrk_counter()
 {
     delete ui;
+}
+
+/**
+ * Saves data and window settings upon closing
+ */
+void ffrk_counter::closeEvent(QCloseEvent *e)
+{
+    save_data() ;
+    save_settings() ;
+    e->accept() ;
+}
+
+/**
+ * Saves current data
+ */
+void ffrk_counter::save_data()
+{
+    QFile data_out(_data_file) ;
+    data_out.open(QFile::WriteOnly) ;
+    if( data_out.exists() ) {
+        QTextStream output( &data_out ) ;
+        output << ui->item_name_1->text() << "," << ui->num_runs_1->text() << "\n" ;
+        output << ui->rarity1_1->text() << "," << ui->count1_1->text() << "\n" ;
+        output << ui->rarity2_1->text() << "," << ui->count2_1->text() << "\n" ;
+        output << ui->rarity3_1->text() << "," << ui->count3_1->text() << "\n" ;
+
+        output << ui->item_name_2->text() << "," << ui->num_runs_2->text() << "\n" ;
+        output << ui->rarity1_2->text() << "," << ui->count1_2->text() << "\n" ;
+        output << ui->rarity2_2->text() << "," << ui->count2_2->text() << "\n" ;
+        output << ui->rarity3_2->text() << "," << ui->count3_2->text() << "\n" ;
+
+        output << ui->item_name_3->text() << "," << ui->num_runs_3->text() << "\n" ;
+        output << ui->rarity1_3->text() << "," << ui->count1_3->text() << "\n" ;
+        output << ui->rarity2_3->text() << "," << ui->count2_3->text() << "\n" ;
+        output << ui->rarity3_3->text() << "," << ui->count3_3->text() ;
+    } else {
+        QMessageBox msg ;
+        msg.setWindowTitle("Error saving data") ;
+        msg.setText( data_out.errorString() ) ;
+        msg.exec() ;
+    }
+    data_out.close() ;
+}
+
+/**
+ * Loads existing data, if present
+ */
+void ffrk_counter::load_data()
+{
+    QFile data_in(_data_file) ;
+    data_in.open(QFile::ReadOnly) ;
+    if( data_in.exists() ) {
+        QTextStream input( &data_in ) ;
+        while( !input.atEnd() ) {
+            // Item one
+            QString line = input.readLine() ;
+            QStringList items = line.split(",") ;
+            ui->item_name_1->setText( items[0] ) ;
+            ui->num_runs_1->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity1_1->setText( items[0] ) ;
+            ui->count1_1->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity2_1->setText( items[0] ) ;
+            ui->count2_1->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity3_1->setText( items[0] ) ;
+            ui->count3_1->setText( items[1] ) ;
+
+            // Item two
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->item_name_2->setText( items[0] ) ;
+            ui->num_runs_2->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity1_2->setText( items[0] ) ;
+            ui->count1_2->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity2_2->setText( items[0] ) ;
+            ui->count2_2->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity3_2->setText( items[0] ) ;
+            ui->count3_2->setText( items[1] ) ;
+
+            // Item three
+            ui->item_name_3->setText( items[0] ) ;
+            ui->num_runs_3->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity1_3->setText( items[0] ) ;
+            ui->count1_3->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity2_3->setText( items[0] ) ;
+            ui->count2_3->setText( items[1] ) ;
+            line = input.readLine() ;
+            items = line.split(",") ;
+            ui->rarity3_3->setText( items[0] ) ;
+            ui->count3_3->setText( items[1] ) ;
+            line = input.readLine() ;
+        }
+    } else {
+        /** Quitely fail, its ok if it doesn't exist */
+    }
+    data_in.close() ;
+}
+
+/**
+ * Restores window settings
+ */
+void ffrk_counter::restore_settings()
+{
+    if( _settings.contains("position") )
+        move( _settings.value("position").toPoint() ) ;
+    if( _settings.contains("size") )
+        resize( _settings.value("size").toSize() ) ;
+}
+
+/**
+ * Saves window settings
+ */
+void ffrk_counter::save_settings()
+{
+    _settings.setValue("position", pos()) ;
+    _settings.setValue("size", size()) ;
 }
 
 /**

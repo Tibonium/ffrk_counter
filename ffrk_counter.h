@@ -5,6 +5,11 @@
 #include <QObject>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QSettings>
+#include <QFile>
+#include <QStringList>
+#include <QMessageBox>
+#include <QTextStream>
 
 #include <iostream>
 
@@ -20,6 +25,7 @@ public:
     explicit ffrk_counter(QWidget *parent = 0);
     ~ffrk_counter();
 
+    void closeEvent(QCloseEvent *e) ;
     bool eventFilter(QObject *o, QEvent *e) ;
 
 private slots:
@@ -41,6 +47,14 @@ private slots:
 
 private:
     Ui::ffrk_counter *ui;
+
+    QString _data_file ;
+    void load_data() ;
+    void save_data() ;
+
+    QSettings _settings ;
+    void restore_settings() ;
+    void save_settings() ;
 
     void update_drop_rate(int section) ;
     void update_drop_rate(int section, int rarity) ;
