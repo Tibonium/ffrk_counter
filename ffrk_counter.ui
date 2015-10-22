@@ -6,428 +6,59 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>335</width>
-    <height>485</height>
+    <width>662</width>
+    <height>283</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>FFRK Counter</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLineEdit" name="item_name_1">
-         <property name="placeholderText">
-          <string>Item</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="num_runs_1">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0" colspan="2">
+      <widget class="QTableWidget" name="drop_table">
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Runs</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Count</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Drop Rate</string>
+        </property>
+       </column>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLineEdit" name="rarity1_1">
-         <property name="placeholderText">
-          <string>Rarity 1</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count1_1">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop1_1">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="add_row_button">
+       <property name="text">
+        <string>Add Row</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLineEdit" name="rarity2_1">
-         <property name="placeholderText">
-          <string>Rarity 2</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count2_1">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop2_1">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLineEdit" name="rarity3_1">
-         <property name="placeholderText">
-          <string>Rarity 3</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count3_1">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop3_1">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLineEdit" name="item_name_2">
-         <property name="placeholderText">
-          <string>Item</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="num_runs_2">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QLineEdit" name="rarity1_2">
-         <property name="placeholderText">
-          <string>Rarity 1</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count1_2">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop1_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLineEdit" name="rarity2_2">
-         <property name="placeholderText">
-          <string>Rarity 2</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count2_2">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop2_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_8">
-       <item>
-        <widget class="QLineEdit" name="rarity3_2">
-         <property name="placeholderText">
-          <string>Rarity 3</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count3_2">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop3_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
-       <item>
-        <widget class="QLineEdit" name="item_name_3">
-         <property name="placeholderText">
-          <string>Item</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="num_runs_3">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_10">
-       <item>
-        <widget class="QLineEdit" name="rarity1_3">
-         <property name="placeholderText">
-          <string>Rarity 1</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count1_3">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop1_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_11">
-       <item>
-        <widget class="QLineEdit" name="rarity2_3">
-         <property name="placeholderText">
-          <string>Rarity 2</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count2_3">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop2_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_12">
-       <item>
-        <widget class="QLineEdit" name="rarity3_3">
-         <property name="placeholderText">
-          <string>Rarity 3</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="count3_3">
-         <property name="maximumSize">
-          <size>
-           <width>41</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="placeholderText">
-          <string>Count</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="drop3_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Drop Rate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="remove_row_button">
+       <property name="text">
+        <string>Remove Row</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

@@ -22,6 +22,14 @@ class ffrk_counter : public QWidget
     Q_OBJECT
 
 public:
+
+    typedef enum {
+        NAME  = 0,
+        RUNS  = 1,
+        COUNT = 2,
+        INFO  = 3
+    } column_type ;
+
     explicit ffrk_counter(QWidget *parent = 0);
     ~ffrk_counter();
 
@@ -29,21 +37,12 @@ public:
     bool eventFilter(QObject *o, QEvent *e) ;
 
 private slots:
-    void on_num_runs_1_textChanged(const QString &arg1);
-    void on_count1_1_textChanged(const QString &arg1);
-    void on_count2_1_textChanged(const QString &arg1);
-    void on_count3_1_textChanged(const QString &arg1);
 
-    void on_num_runs_2_textChanged(const QString &arg1);
-    void on_count1_2_textChanged(const QString &arg1);
-    void on_count2_2_textChanged(const QString &arg1);
-    void on_count3_2_textChanged(const QString &arg1);
+    void on_drop_table_cellChanged(int row, int column);
 
-    void on_num_runs_3_textChanged(const QString &arg1);
-    void on_count1_3_textChanged(const QString &arg1);
-    void on_count2_3_textChanged(const QString &arg1);
-    void on_count3_3_textChanged(const QString &arg1);
+    void on_add_row_button_clicked();
 
+    void on_remove_row_button_clicked();
 
 private:
     Ui::ffrk_counter *ui;
@@ -56,8 +55,9 @@ private:
     void restore_settings() ;
     void save_settings() ;
 
-    void update_drop_rate(int section) ;
-    void update_drop_rate(int section, int rarity) ;
+    bool _initialized ;
+    void update_information(int row) ;
+    int add_row() ;
 };
 
 #endif // FFRK_COUNTER_H

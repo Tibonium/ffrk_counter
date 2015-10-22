@@ -8,39 +8,19 @@ ffrk_counter::ffrk_counter(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ffrk_counter),
     _data_file("ffrk_counter_data"),
-    _settings("Tibonium Inc.", "FFRK Counter")
+    _settings("Tibonium Inc.", "FFRK Counter"),
+    _initialized(false)
 {
     ui->setupUi(this);
-    QIntValidator *validator = new QIntValidator(0, 1000000, this) ;
-    ui->num_runs_1->setValidator( validator ) ;
-    ui->num_runs_1->installEventFilter( this ) ;
-    ui->count1_1->setValidator( validator ) ;
-    ui->count1_1->installEventFilter( this ) ;
-    ui->count2_1->setValidator( validator ) ;
-    ui->count2_1->installEventFilter( this ) ;
-    ui->count3_1->setValidator( validator ) ;
-    ui->count3_1->installEventFilter( this ) ;
-
-    ui->num_runs_2->setValidator( validator ) ;
-    ui->num_runs_2->installEventFilter( this ) ;
-    ui->count1_2->setValidator( validator ) ;
-    ui->count1_2->installEventFilter( this ) ;
-    ui->count2_2->setValidator( validator ) ;
-    ui->count2_2->installEventFilter( this ) ;
-    ui->count3_2->setValidator( validator ) ;
-    ui->count3_2->installEventFilter( this ) ;
-
-    ui->num_runs_3->setValidator( validator ) ;
-    ui->num_runs_3->installEventFilter( this ) ;
-    ui->count1_3->setValidator( validator ) ;
-    ui->count1_3->installEventFilter( this ) ;
-    ui->count2_3->setValidator( validator ) ;
-    ui->count2_3->installEventFilter( this ) ;
-    ui->count3_3->setValidator( validator ) ;
-    ui->count3_3->installEventFilter( this ) ;
-
+    ui->drop_table->installEventFilter(this) ;
     restore_settings() ;
     load_data() ;
+    _initialized = true ;
+    int size( ui->drop_table->rowCount() ) ;
+    for(int i=0; i<size; ++i) {
+        update_information( i ) ;
+    }
+    ui->drop_table->resizeColumnsToContents() ;
 }
 
 /**
@@ -69,21 +49,17 @@ void ffrk_counter::save_data()
     QFile data_out(_data_file) ;
     data_out.open(QFile::WriteOnly) ;
     if( data_out.exists() ) {
+        QTableWidget *table = ui->drop_table ;
+        int size( table->rowCount() ) ;
         QTextStream output( &data_out ) ;
-        output << ui->item_name_1->text() << "," << ui->num_runs_1->text() << "\n" ;
-        output << ui->rarity1_1->text() << "," << ui->count1_1->text() << "\n" ;
-        output << ui->rarity2_1->text() << "," << ui->count2_1->text() << "\n" ;
-        output << ui->rarity3_1->text() << "," << ui->count3_1->text() << "\n" ;
-
-        output << ui->item_name_2->text() << "," << ui->num_runs_2->text() << "\n" ;
-        output << ui->rarity1_2->text() << "," << ui->count1_2->text() << "\n" ;
-        output << ui->rarity2_2->text() << "," << ui->count2_2->text() << "\n" ;
-        output << ui->rarity3_2->text() << "," << ui->count3_2->text() << "\n" ;
-
-        output << ui->item_name_3->text() << "," << ui->num_runs_3->text() << "\n" ;
-        output << ui->rarity1_3->text() << "," << ui->count1_3->text() << "\n" ;
-        output << ui->rarity2_3->text() << "," << ui->count2_3->text() << "\n" ;
-        output << ui->rarity3_3->text() << "," << ui->count3_3->text() ;
+        for(int i=0; i<size; ++i) {
+            output << table->item(i, NAME)->text() << ","
+                   << table->item(i, RUNS)->text() << ","
+                   << table->item(i, COUNT)->text() ;
+            if( i < size-1 ) {
+                output << "\n" ;
+            }
+        }
     } else {
         QMessageBox msg ;
         msg.setWindowTitle("Error saving data") ;
@@ -101,60 +77,15 @@ void ffrk_counter::load_data()
     QFile data_in(_data_file) ;
     data_in.open(QFile::ReadOnly) ;
     if( data_in.exists() ) {
+        QTableWidget *table = ui->drop_table ;
         QTextStream input( &data_in ) ;
         while( !input.atEnd() ) {
-            // Item one
             QString line = input.readLine() ;
-            QStringList items = line.split(",") ;
-            ui->item_name_1->setText( items[0] ) ;
-            ui->num_runs_1->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity1_1->setText( items[0] ) ;
-            ui->count1_1->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity2_1->setText( items[0] ) ;
-            ui->count2_1->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity3_1->setText( items[0] ) ;
-            ui->count3_1->setText( items[1] ) ;
-
-            // Item two
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->item_name_2->setText( items[0] ) ;
-            ui->num_runs_2->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity1_2->setText( items[0] ) ;
-            ui->count1_2->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity2_2->setText( items[0] ) ;
-            ui->count2_2->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity3_2->setText( items[0] ) ;
-            ui->count3_2->setText( items[1] ) ;
-
-            // Item three
-            ui->item_name_3->setText( items[0] ) ;
-            ui->num_runs_3->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity1_3->setText( items[0] ) ;
-            ui->count1_3->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity2_3->setText( items[0] ) ;
-            ui->count2_3->setText( items[1] ) ;
-            line = input.readLine() ;
-            items = line.split(",") ;
-            ui->rarity3_3->setText( items[0] ) ;
-            ui->count3_3->setText( items[1] ) ;
-            line = input.readLine() ;
+            QStringList data = line.split(",") ;
+            int row = add_row() ;
+            table->item(row, NAME)->setText( data[0] ) ;
+            table->item(row, RUNS)->setText( data[1] ) ;
+            table->item(row, COUNT)->setText( data[2] ) ;
         }
     } else {
         /** Quitely fail, its ok if it doesn't exist */
@@ -187,511 +118,191 @@ void ffrk_counter::save_settings()
  */
 bool ffrk_counter::eventFilter(QObject *o, QEvent *e)
 {
-    QLineEdit *obj = static_cast<QLineEdit*>(o) ;
-    /** ============================= Section One ============================= **/
-    if( obj == ui->num_runs_1 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->num_runs_1->text().toInt() ;
+    if( e->type() == QEvent::KeyPress ) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
+        QKeySequence keySeq( keyEvent->key() | keyEvent->modifiers() ) ;
+        if( keySeq.matches( QKeySequence(Qt::CTRL + Qt::Key_Up) ) ) {
+            int value = 0 ;
+            int size( ui->drop_table->rowCount() ) ;
+            for(int i=0; i<size; ++i) {
+                value = ui->drop_table->item(i, RUNS)->text().toInt() ;
                 value++ ;
-                ui->num_runs_1->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->num_runs_1->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->num_runs_1->setText( QString::number(0) ) ;
-                else
-                    ui->num_runs_1->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->num_runs_1->setText( QString::number(0) ) ;
+                ui->drop_table->item(i, RUNS)->setText( QString::number(value) ) ;
             }
-        }
-    } else
-    if( obj == ui->count1_1 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count1_1->text().toInt() ;
-                value++ ;
-                ui->count1_1->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count1_1->text().toInt() ;
+            return true ;
+        } else
+        if( keySeq.matches( QKeySequence(Qt::CTRL + Qt::Key_Down) ) ) {
+            int value = 0 ;
+            int size( ui->drop_table->rowCount() ) ;
+            for(int i=0; i<size; ++i) {
+                value = ui->drop_table->item(i, RUNS)->text().toInt() ;
                 value-- ;
-                if( value < 0 )
-                    ui->count1_1->setText( QString::number(0) ) ;
+                if( 0 < value )
+                    ui->drop_table->item(i, RUNS)->setText( QString::number(value) ) ;
                 else
-                    ui->count1_1->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count1_1->setText( QString::number(0) ) ;
+                    ui->drop_table->item(i, RUNS)->setText( QString::number(0) ) ;
             }
+            return true ;
         }
-    } else
-    if( obj == ui->count2_1 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count2_1->text().toInt() ;
+    }
+    if( e->type() == QEvent::KeyPress ) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
+        int column = ui->drop_table->currentColumn() ;
+        if( column == RUNS || column == COUNT ) {
+            if( keyEvent->key() == Qt::Key_Plus ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
                 value++ ;
-                ui->count2_1->setText( QString::number(value) ) ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count2_1->text().toInt() ;
+            if( keyEvent->key() == Qt::Key_Minus ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
                 value-- ;
-                if( value < 0 )
-                    ui->count2_1->setText( QString::number(0) ) ;
+                if( 0 < value )
+                    ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
                 else
-                    ui->count2_1->setText( QString::number(value) ) ;
+                    ui->drop_table->item(row, column)->setText( QString::number(0) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count2_1->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count3_1 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count3_1->text().toInt() ;
+            if( keyEvent->key() == Qt::Key_1 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
                 value++ ;
-                ui->count3_1->setText( QString::number(value) ) ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count3_1->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count3_1->setText( QString::number(0) ) ;
-                else
-                    ui->count3_1->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_2 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 2 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count3_1->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    /** ============================= Section two ============================= **/
-    if( obj == ui->num_runs_2 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->num_runs_2->text().toInt() ;
-                value++ ;
-                ui->num_runs_2->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_3 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 3 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->num_runs_2->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->num_runs_2->setText( QString::number(0) ) ;
-                else
-                    ui->num_runs_2->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_4 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 4 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->num_runs_2->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count1_2 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count1_2->text().toInt() ;
-                value++ ;
-                ui->count1_2->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_5 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 5 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count1_2->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count1_2->setText( QString::number(0) ) ;
-                else
-                    ui->count1_2->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_6 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 6 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count1_2->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count2_2 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count2_2->text().toInt() ;
-                value++ ;
-                ui->count2_2->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_7 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 7 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count2_2->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count2_2->setText( QString::number(0) ) ;
-                else
-                    ui->count2_2->setText( QString::number(value) ) ;
+            if( keyEvent->key() == Qt::Key_8 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 8 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count2_2->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count3_2 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count3_2->text().toInt() ;
-                value++ ;
-                ui->count3_2->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count3_2->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count3_2->setText( QString::number(0) ) ;
-                else
-                    ui->count3_2->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count3_2->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    /** ============================= Section three ============================= **/
-    if( obj == ui->num_runs_3 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->num_runs_3->text().toInt() ;
-                value++ ;
-                ui->num_runs_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->num_runs_3->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->num_runs_3->setText( QString::number(0) ) ;
-                else
-                    ui->num_runs_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->num_runs_3->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count1_3 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count1_3->text().toInt() ;
-                value++ ;
-                ui->count1_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count1_3->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count1_3->setText( QString::number(0) ) ;
-                else
-                    ui->count1_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count1_3->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count2_3 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count2_3->text().toInt() ;
-                value++ ;
-                ui->count2_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count2_3->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count2_3->setText( QString::number(0) ) ;
-                else
-                    ui->count2_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count2_3->setText( QString::number(0) ) ;
-            }
-        }
-    } else
-    if( obj == ui->count3_3 ) {
-        if( e->type() == QEvent::KeyPress ) {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(e) ;
-            if( keyEvent->key() == Qt::Key_Up ) {
-                int value = ui->count3_3->text().toInt() ;
-                value++ ;
-                ui->count3_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Down ) {
-                int value = ui->count3_3->text().toInt() ;
-                value-- ;
-                if( value < 0 )
-                    ui->count3_3->setText( QString::number(0) ) ;
-                else
-                    ui->count3_3->setText( QString::number(value) ) ;
-            } else
-            if( keyEvent->key() == Qt::Key_Delete ) {
-                ui->count3_3->setText( QString::number(0) ) ;
+            if( keyEvent->key() == Qt::Key_9 ) {
+                int row = ui->drop_table->currentRow() ;
+                int value = ui->drop_table->item(row, column)->text().toInt() ; ;
+                value += 9 ;
+                ui->drop_table->item(row, column)->setText( QString::number(value) ) ;
+                return true ;
             }
         }
     }
-
-    return QWidget::eventFilter(obj,e) ;
+    return QWidget::eventFilter(o,e) ;
 }
 
 /**
  * Updates an entire section
  */
-void ffrk_counter::update_drop_rate(int section)
+void ffrk_counter::update_information(int row)
 {
-    int num_runs = 0 ;
-    int drop_count1 = 0 ;
-    int drop_count2 = 0 ;
-    int drop_count3 = 0 ;
-    double drop_rate = 0 ;
-    QString tmp("Drop Rate: ") ;
-    switch( section ) {
-        case 1:
-            num_runs = ui->num_runs_1->text().toInt() ;
-            // First Rarity
-            drop_count1 = ui->count1_1->text().toInt() ;
-            drop_rate = double(drop_count1) / double(num_runs) ;
-            ui->drop1_1->setText( tmp + QString::number(drop_rate) ) ;
-            // Second Rarity
-            drop_count2 = ui->count2_1->text().toInt() ;
-            drop_rate = double(drop_count2) / double(num_runs) ;
-            ui->drop2_1->setText( tmp + QString::number(drop_rate) ) ;
-            // Third Rarity
-            drop_count3 = ui->count3_1->text().toInt() ;
-            drop_rate = double(drop_count3) / double(num_runs) ;
-            ui->drop3_1->setText( tmp + QString::number(drop_rate) ) ;
-            break ;
-        case 2:
-            num_runs = ui->num_runs_2->text().toInt() ;
-            // First Rarity
-            drop_count1 = ui->count1_2->text().toInt() ;
-            drop_rate = double(drop_count1) / double(num_runs) ;
-            ui->drop1_2->setText( tmp + QString::number(drop_rate) ) ;
-            // Second Rarity
-            drop_count2 = ui->count2_2->text().toInt() ;
-            drop_rate = double(drop_count2) / double(num_runs) ;
-            ui->drop2_2->setText( tmp + QString::number(drop_rate) ) ;
-            // Third Rarity
-            drop_count3 = ui->count3_2->text().toInt() ;
-            drop_rate = double(drop_count3) / double(num_runs) ;
-            ui->drop3_2->setText( tmp + QString::number(drop_rate) ) ;
-            break ;
-        case 3:
-            num_runs = ui->num_runs_3->text().toInt() ;
-            // First Rarity
-            drop_count1 = ui->count1_3->text().toInt() ;
-            drop_rate = double(drop_count1) / double(num_runs) ;
-            ui->drop1_3->setText( tmp + QString::number(drop_rate) ) ;
-            // Second Rarity
-            drop_count2 = ui->count2_3->text().toInt() ;
-            drop_rate = double(drop_count2) / double(num_runs) ;
-            ui->drop2_3->setText( tmp + QString::number(drop_rate) ) ;
-            // Third Rarity
-            drop_count3 = ui->count3_3->text().toInt() ;
-            drop_rate = double(drop_count3) / double(num_runs) ;
-            ui->drop3_3->setText( tmp + QString::number(drop_rate) ) ;
-            break ;
-        default:
-            break ;
-    }
+    int runs = ui->drop_table->item(row, RUNS)->text().toInt() ;
+    int count = ui->drop_table->item(row, COUNT)->text().toInt() ;
+    double drop_rate = double(count) / double(runs) ;
+    ui->drop_table->item(row, INFO)->setText(  QString::number(drop_rate) ) ;
 }
 
 /**
- * Updates a single rarity of a section
+ * Helper function that adds another row to the table
  */
-void ffrk_counter::update_drop_rate(int section, int rarity)
+int ffrk_counter::add_row()
 {
-    int num_runs = 0 ;
-    int drop_count = 0 ;
-    double drop_rate = 0 ;
-    QString tmp("Drop Rate: ") ;
-    switch( section ) {
-        case 1:
-            num_runs = ui->num_runs_1->text().toInt() ;
-            switch( rarity ) {
-                case 1:
-                    drop_count = ui->count1_1->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop1_1->setText( tmp ) ;
-                    break ;
-                case 2:
-                    drop_count = ui->count2_1->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop2_1->setText( tmp ) ;
-                    break ;
-                case 3:
-                    drop_count = ui->count3_1->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop3_1->setText( tmp ) ;
-                    break ;
-                default:
-                    break ;
-            }
-            break ;
-        case 2:
-            num_runs = ui->num_runs_2->text().toInt() ;
-            switch( rarity ) {
-                case 1:
-                    drop_count = ui->count1_2->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop1_2->setText( tmp ) ;
-                    break ;
-                case 2:
-                    drop_count = ui->count2_2->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop2_2->setText( tmp ) ;
-                    break ;
-                case 3:
-                    drop_count = ui->count3_2->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop3_2->setText( tmp ) ;
-                    break ;
-                default:
-                    break ;
-            }
-            break ;
-        case 3:
-            num_runs = ui->num_runs_3->text().toInt() ;
-            switch( rarity ) {
-                case 1:
-                    drop_count = ui->count1_3->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop1_3->setText( tmp ) ;
-                    break ;
-                case 2:
-                    drop_count = ui->count2_3->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop2_3->setText( tmp ) ;
-                    break ;
-                case 3:
-                    drop_count = ui->count3_3->text().toInt() ;
-                    drop_rate = double(drop_count) / double(num_runs) ;
-                    tmp += QString::number(drop_rate) ;
-                    ui->drop3_3->setText( tmp ) ;
-                    break ;
-                default:
-                    break ;
-            }
-            break ;
-        default:
-            break ;
-    }
+    ui->drop_table->insertRow( ui->drop_table->rowCount() ) ;
+    int row = ui->drop_table->rowCount() - 1 ;
+
+    ui->drop_table->setItem(row, NAME, new QTableWidgetItem(QString()) ) ;
+
+    QTableWidgetItem *runs = new QTableWidgetItem(QString("0")) ;
+    runs->setFlags( runs->flags() ^ Qt::ItemIsEditable ) ;
+    ui->drop_table->setItem(row, RUNS, runs ) ;
+
+    QTableWidgetItem *count = new QTableWidgetItem(QString("0")) ;
+    count->setFlags( count->flags() ^ Qt::ItemIsEditable ) ;
+    ui->drop_table->setItem(row, COUNT, count ) ;
+
+    QTableWidgetItem *info = new QTableWidgetItem(QString("0")) ;
+    info->setFlags( info->flags() ^ Qt::ItemIsEditable ) ;
+    ui->drop_table->setItem(row, INFO, info ) ;
+
+    return row ;
 }
 
 /** ======================================== SLOTS ======================================== **/
 /**
- * Callbacks for information updated in Item 1's section
+ * Callback to update information when data has changed
  */
-void ffrk_counter::on_num_runs_1_textChanged(const QString &arg1)
+void ffrk_counter::on_drop_table_cellChanged(int row, int column)
 {
-    if( 0 < arg1.toInt() ) {
-        update_drop_rate( 1 ) ;
-    } else {
-        ui->drop1_1->setText("Drop Rate: ---") ;
-        ui->drop2_1->setText("Drop Rate: ---") ;
-        ui->drop3_1->setText("Drop Rate: ---") ;
+    if( _initialized ) {
+        switch(column) {
+            case RUNS:
+                update_information( row ) ;
+                break ;
+            case COUNT:
+                update_information( row ) ;
+                break ;
+            default:
+                break ;
+        }
     }
-}
-
-void ffrk_counter::on_count1_1_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 1, 1 ) ;
-}
-
-void ffrk_counter::on_count2_1_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 1, 2 ) ;
-}
-
-void ffrk_counter::on_count3_1_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 1, 3 ) ;
 }
 
 /**
- * Callbacks for information updated in Item 2's section
+ * Adds another row to the table
  */
-void ffrk_counter::on_num_runs_2_textChanged(const QString &arg1)
+void ffrk_counter::on_add_row_button_clicked()
 {
-    if( 0 < arg1.toInt() ) {
-        update_drop_rate( 2 ) ;
-    } else {
-        ui->drop1_2->setText("Drop Rate: ---") ;
-        ui->drop2_2->setText("Drop Rate: ---") ;
-        ui->drop3_2->setText("Drop Rate: ---") ;
-    }
-}
-
-void ffrk_counter::on_count1_2_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 2, 1 ) ;
-}
-
-void ffrk_counter::on_count2_2_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 2, 2 ) ;
-}
-
-void ffrk_counter::on_count3_2_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 2, 3 ) ;
+    add_row() ;
 }
 
 /**
- * Callbacks for information updated in Item 3's section
+ * Removes the current row from the table
  */
-void ffrk_counter::on_num_runs_3_textChanged(const QString &arg1)
+void ffrk_counter::on_remove_row_button_clicked()
 {
-    if( 0 < arg1.toInt() ) {
-        update_drop_rate( 3 ) ;
-    } else {
-        ui->drop1_3->setText("Drop Rate: ---") ;
-        ui->drop2_3->setText("Drop Rate: ---") ;
-        ui->drop3_3->setText("Drop Rate: ---") ;
-    }
-}
-
-void ffrk_counter::on_count1_3_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 3, 1 ) ;
-}
-
-void ffrk_counter::on_count2_3_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 3, 2 ) ;
-}
-
-void ffrk_counter::on_count3_3_textChanged(const QString &arg1)
-{
-    if( -1 < arg1.toInt() )
-        update_drop_rate( 3, 3 ) ;
+    int row = ui->drop_table->currentRow() ;
+    ui->drop_table->removeRow( row ) ;
 }
